@@ -319,10 +319,11 @@ TEST_CASE("SideCrossIterator adding and deleteing elements after creating the it
     MagicalContainer container;
     container.addElement(2);
     container.addElement(3);
+    container.addElement(5);
     container.addElement(7);
     container.addElement(10);
     container.addElement(12);
-
+    //(2,3,5,7,10,12)
     MagicalContainer::SideCrossIterator side_iter(container);
     // checking AscendingIterator
     CHECK(*side_iter == 2);
