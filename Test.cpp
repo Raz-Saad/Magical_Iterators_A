@@ -307,8 +307,7 @@ TEST_CASE("AscendingIterator adding and deleteing elements after creating the it
     ++ascend_iter;
     CHECK(*ascend_iter == 7);
     container.removeElement(10); // deleting an element(3,5,7)
-    ++ascend_iter;               // points on end
-
+ 
     CHECK(ascend_iter == ascend_iter.end());
     // checking if 3 is the first element as it should be
     CHECK(*ascend_iter.begin() == 3);
