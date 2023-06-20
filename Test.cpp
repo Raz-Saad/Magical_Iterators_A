@@ -209,6 +209,7 @@ TEST_CASE("Checking *iter for every type of iterator")
     container.addElement(11);
     container.addElement(3);
     container.addElement(12);
+    // 1,2,3,7,11,12
     MagicalContainer::AscendingIterator ascend_iter(container);
     MagicalContainer::SideCrossIterator side_iter(container);
     MagicalContainer::PrimeIterator prime_iter(container);
@@ -226,28 +227,27 @@ TEST_CASE("Checking *iter for every type of iterator")
     ++ascend_iter;
     CHECK(*ascend_iter == 12);
 
-    //checking SideCrossIterator
+    // checking SideCrossIterator
     CHECK(*side_iter == 1);
     ++side_iter;
     CHECK(*side_iter == 12);
     ++side_iter;
     CHECK(*side_iter == 2);
     ++side_iter;
+    CHECK(*side_iter == 11);
+    ++side_iter;
     CHECK(*side_iter == 3);
     ++side_iter;
     CHECK(*side_iter == 7);
-    ++side_iter;
-    CHECK(*side_iter == 11);
 
     // checking PrimeIterator
-
     CHECK(*prime_iter == 2);
+    ++prime_iter;
+    CHECK(*prime_iter == 3);
     ++prime_iter;
     CHECK(*prime_iter == 7);
     ++prime_iter;
     CHECK(*prime_iter == 11);
-    ++prime_iter;
-    CHECK(*prime_iter == 3);
 }
 
 TEST_CASE("Checking = or every type of iterator")
@@ -286,4 +286,105 @@ TEST_CASE("PrimeIterator  ++operator throw")
 
     // there is no prime number in this container
     CHECK_THROWS(++prime_iter);
+}
+
+TEST_CASE("AscendingIterator adding and deleteing elements after creating the iterator")
+{
+    MagicalContainer container;
+    container.addElement(2);
+    container.addElement(3);
+    container.addElement(7);
+    container.addElement(10);
+    MagicalContainer::AscendingIterator ascend_iter(container);
+
+    CHECK(*ascend_iter == 2);
+    ++ascend_iter;
+    CHECK(*ascend_iter == 3);
+    ++ascend_iter;
+    container.removeElement(2); // deleting an element(3,7,10)
+    container.addElement(5);    // adding an element (3,5,7,10)
+    CHECK(*ascend_iter == 5);
+    ++ascend_iter;
+    CHECK(*ascend_iter == 7);
+    container.removeElement(10); // deleting an element(3,5,7)
+    ++ascend_iter;               // points on end
+
+    CHECK(ascend_iter == ascend_iter.end());
+    // checking if 3 is the first element as it should be
+    CHECK(*ascend_iter.begin() == 3);
+}
+
+TEST_CASE("SideCrossIterator adding and deleteing elements after creating the iterator")
+{
+    MagicalContainer container;
+    container.addElement(2);
+    container.addElement(3);
+    container.addElement(7);
+    container.addElement(10);
+    container.addElement(12);
+
+    MagicalContainer::SideCrossIterator side_iter(container);
+    // checking AscendingIterator
+    CHECK(*side_iter == 2);
+    ++side_iter;
+    CHECK(*side_iter == 12);
+    ++side_iter;
+
+    container.addElement(11); // adding an element (2,3,5,7,10,11,12)
+
+    CHECK(*side_iter == 3);
+    ++side_iter;
+
+    container.removeElement(5); // deleting an element (2,3,7,10,11,12)
+
+    CHECK(*side_iter == 11);
+    ++side_iter;
+    CHECK(*side_iter == 7);
+    ++side_iter;
+
+    container.addElement(8); // adding an element (2,3,7,8,10,11,12)
+
+    CHECK(*side_iter == 10);
+    ++side_iter;
+    CHECK(*side_iter == 8);
+    ++side_iter; // points on end
+
+    CHECK(side_iter == side_iter.end());
+
+    container.addElement(1); // adding an element (1,2,3,7,8,10,11,12)
+    // checking if 1 is the first element as it should be
+    CHECK(*side_iter.begin() == 1);
+}
+
+TEST_CASE("PrimeIterator adding and deleteing elements after creating the iterator and ")
+{
+    MagicalContainer container;
+    container.addElement(3);
+    container.addElement(5);
+    container.addElement(13);
+    container.addElement(17);
+    MagicalContainer::PrimeIterator prime_iter(container);
+
+    CHECK(*prime_iter == 3);
+    ++prime_iter;
+    CHECK(*prime_iter == 5);
+    ++prime_iter;
+
+    container.addElement(7);  // adding an element (3,5,7,13,17)
+    container.addElement(19); // adding an element (3,5,7,13,17,19)
+
+    CHECK(*prime_iter == 7);
+    ++prime_iter;
+    CHECK(*prime_iter == 13);
+    ++prime_iter;
+
+    container.removeElement(17); // deleting an element (3,5,7,13,19)
+
+    CHECK(*prime_iter == 19);
+    ++prime_iter; // points on end
+    CHECK(prime_iter == prime_iter.end());
+
+    container.addElement(2); // adding an element (2,3,5,7,13,19)
+    // checking if 2 is the first element as it should be
+    CHECK(*prime_iter.begin() == 2);
 }
